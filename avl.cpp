@@ -1,6 +1,7 @@
 #include <iostream>
 using namespace std;
 
+// avl functions
 struct node
 {
     int key;
@@ -15,7 +16,11 @@ int height(node *node)
     {
         return -1;
     }
-    return(node->height);
+    else
+    {
+            return(node->height);
+    }
+
 }
 
 node *newNode(int key)
@@ -46,97 +51,166 @@ int getBalance(node *node)
 node *leftRotate(node *x){
     struct node *y = x->right;
     //add more code to rotate to the left, update heights for x and y
-    y->left = x;
-    x->right = NULL;
-    y->height = max(height(x->left), height(x->right)) + 1;
-    x->height --;
-    if(y->right != NULL)
-    {
-        y->right->height ++;
-    }  
+    x->right = y->left;
+    y->left = x;    
+    x->height = max(height(x->left), height(x->right)) + 1; 
+    y->height = max(height(y->left), height(y->right)) + 1;
+    // cout << height(x->left) << height(x->right);
     return(y);
 }
 
 node *rightRotate(node *x){
     struct node *y=x->left;
     //add more code to rotate to the right, update heights for x and y
+    x->left = y->right;
     y->right = x;
-    x->left = NULL;
-    y->height = max(height(x->left), height(x->right)) + 1;
-    x->height --;
-    if(y->left != NULL)
-    {
-        y->left->height ++;
-    }
+    x->height = max(height(x->left), height(x->right)) + 1;
+    y->height = max(height(y->left), height(y->right)) + 1;
     return(y);
 }
 
-node * rebalance(node *node){
+// node *rebalance(node *node){
+//     // cout << "start rebalance for node " << node->key << '\n';
+//     // cout << "node " << node->key << " left height = " << height(node->left) << "   node " << node->key << " right height = " << height(node->right) << " max (get hieght ) is = " << max(height(node->left), height(node->right)) + 1 <<  '\n';
+//     // cout << "balance of node " << node->key << "is " << getBalance(node) << '\n';
+//     node->height = max(height(node->left), height(node->right)) + 1;    
+//     int balance = getBalance(node);  //node->left - node->right
+    
+//     // do rotations as necessary
+//     // If Left heavy outside :
+//     if(balance > 1)
+//     {
+//         return rightRotate(node);
+//     }    
+//     // If right heavy outside:
+//     if(balance < -1)
+//     {
+//         return leftRotate(node);
+//     }  
+//     // If left heavy inside:  left rotation first, right rotation 2nd, return top node
+//     if(balance > 1 && node->left->left == NULL)
+//     {
+//         node->left =  leftRotate(node->left);
+//         return rightRotate(node);
+//     }
+//     // if right heavy inside: right rotation first, left rotation 2nd, return top node
+//     if(balance < -1 && node->right->right == NULL )
+//     {
+//         node->right = rightRotate(node->right);
+//         return leftRotate(node);
+//     }
+
+//     return (node);
+// }
+node * rebalance( node *&node){
+
     node->height = max(height(node->left), height(node->right)) + 1;    
     int balance = getBalance(node);  //node->left - node->right
-    
-    // do rotations as necessary
-    // If Left heavy outside :
-    if(balance > 1 && node->left->left != NULL)
-    {
-        return rightRotate(node);
-    }    
-    // If right heavy outside:
-    else if(balance < -1 && node->right->right != NULL)
-    {
-        return leftRotate(node);
-    }  
-    // If left heavy inside:  left rotation first, right rotation 2nd, return top node
-    else if(balance > 1 && node->left->left == NULL)
-    {
-        node->left =  leftRotate(node->left);
-        return rightRotate(node);
-    }
-    // if right heavy inside: right rotation first, left rotation 2nd, return top node
-    else if(balance < -1 && node->right->right == NULL )
-    {
-        node->right = rightRotate(node->right);
-        return leftRotate(node);
+
+    if ((node->left != NULL) && (node->right != NULL)){
+        node->height = max(height(node->left), height(node->right)) + 1;
     }
 
-    return (node);
+    if ( balance < -1){ // RIGHT HEAVY
+        balance=getBalance(node->right); // IS CHILD LEFT HEAVY ?
+        if(balance>0){
+            // double rotation right , left
+            node->right=rightRotate(node->right);
+            return node=leftRotate(node); //  if node is left heavy > 1
+         }
+         else
+             return node=leftRotate(node); //  if node is left heavy > 1
+    }
+   if( balance > 1){ // LEFT HEAVY
+         balance=getBalance(node->left); // IS CHILD RIGHT HEAVY ?
+         if(balance<0){
+            // double rotation left, right
+            node->left=leftRotate(node->left);
+            return node=rightRotate(node); //  if node is left heavy > 1
+         }
+         else
+             return node=rightRotate(node); //  if node is left heavy > 1
+    }
+
+    return node;
 }
 
-node* insert(node*& node, int key)
+node *insert(node*& node, int key)
 {
     //recursive Code for inserting a node 
     //When insert happens set height to 0 for the node     
     if (node == NULL)
     {
         node = newNode(key);
+        // cout << "creating node " <<'\n' << "key = " << node->key << " height = " <<node->height << '\n'; 
         return(node);
     }
     if (key < node->key)
     {
+        // cout << "went to if in insert" <<'\n';
         node->left = insert(node->left, key);
     }
     else
     {
+        // cout << "went to else in insert" <<'\n'; 
         node->right = insert(node->right, key);
     } 
     node = rebalance(node);  //update heights and rebalance
     return node;
 }
 
-void printLevel(node *node)
+// print functions
+struct quenode
 {
-    struct node *endlevel = NULL;
+    struct node* value;
+    struct quenode* next;
+};
 
+void append(quenode*& head, node* value)
+{
+    if(!head)
+    {
+        quenode* newNode = new quenode;
+        newNode->value = value;
+        newNode->next = nullptr;
+        head = newNode;
+    }
+    else
+    {   
+        for(quenode* curr = head; curr != nullptr; curr = curr->next)
+        {
+            if(!curr->next)
+            {
+                quenode* newNode = new quenode;
+                newNode->value = value;
+                newNode->next = nullptr;
+                curr->next = newNode;
+                break;
+            }
+        }
+        quenode* curr = head;
+    }
 }
 
-void push(node *node)
+quenode *returnLast(quenode *&head)
 {
-
-}
-
-void pop(node *node)
-{
-
+    quenode *ret = NULL;
+    for(quenode* curr = head; curr != nullptr; curr = curr->next)
+    {
+        if(curr == head && !curr->next)
+        {
+            ret = curr;
+            curr->next = NULL;
+            return ret;
+        }
+        if(!curr->next->next)
+        {
+            ret = curr->next;
+            curr->next = NULL;
+            return ret;
+        }
+    }
+    return ret;
 }
 
 // Enqueue root ( NodesOnCurrentLevel++)   // add node in current level
@@ -152,19 +226,38 @@ void pop(node *node)
 
 int main()
 {
+    struct quenode *head = NULL;
+    struct quenode *temp = NULL;
     struct node *root = NULL;
+    insert(root, 10);
+    insert(root, 15);
+    insert(root, 6);
     insert(root, 3);
-    // cout << root->key;
-    // cout << root->height << '\n';
-    insert(root,5);
-    // cout << root->left->key;
-    // cout << root->left->height<<'\n';
-    insert(root, 7);
+    insert(root, 8);
+    insert(root, 9);
     cout << root->key << " ";
     cout << root->height << '\n';
     cout << root->left->key<< " ";
     cout << root->left->height<<'\n';
     cout << root->right->key<< " ";
     cout << root->right->height<<'\n';
-    printLevel(root);
+    // cout << root->left->left->key<< " ";
+    // cout << root->left->left->height<<'\n';
+    // cout << root->right->left->key<< " ";
+    // cout << root->right->left->height<<'\n';
+    // cout << root->right->right->key<< " ";
+    // cout << root->right->right->height<<'\n';
+    // append(head, root);
+    // append(head, root->left);
+    // append(head, root->right);
+    // temp = returnLast(head);
+    // cout << temp->value->key;
+    // delete temp;
+    // temp = returnLast(head);
+    // cout << temp->value->key;
+    // delete temp;
+    // temp = returnLast(head);
+    // cout << temp->value->key;
+
+    
 }
