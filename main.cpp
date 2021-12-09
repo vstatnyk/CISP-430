@@ -15,24 +15,29 @@ int temp = 0;
 
 void siftUp(int nodeIndex) // for use in insert
 {
+    //figure out parent index
     int parent = (nodeIndex- 1)/2;
+    
+    // base case
     if(parent == -1)
     {
         return;
     }
+    
     //if parent is greater, then swap and siftUp parentindex 
     if(minHeap[parent] > minHeap[nodeIndex])
     {
         temp = minHeap[nodeIndex];
         minHeap[nodeIndex] = minHeap[parent];
         minHeap[parent] = temp;
+        temp = 0;
         siftUp(parent);
     }
-    
 }
 
-void insert(int value)
+void insertItem(int value)
 {
+    // insert item to last
     minHeap[currLast] = value;
     siftUp(currLast);
     currLast ++;
@@ -40,14 +45,43 @@ void insert(int value)
 
 void siftDown(int parent) // for use in delete
 {
+    // base case
+    if (2*parent+1 >= currLast)
+    {
+        return;
+    }
+
     // figure out which child is smaller
-    // if the parent is > biggest child, then swap and siftDown on the 
-    // index of the smallest child
+    int smallestIndex = 0;
+    if(minHeap[2*parent+1] < minHeap[2*parent+2])
+    {
+        smallestIndex = 2*parent+1;
+    }
+    else
+    {
+        smallestIndex = 2*parent+2;
+    }
+
+    // if the parent is > smallest child, then swap and siftDown on the index of the smallest child
+
+    if(minHeap[parent] > minHeap[smallestIndex])
+    {
+        temp = minHeap[smallestIndex];
+        minHeap[smallestIndex] = minHeap[parent];
+        minHeap[parent] = temp;
+        temp = 0;
+        siftDown(smallestIndex);
+    }
 }
 
-void deleteItem(int arr[])
+void deleteItem()
 {
-
+    // replace 0 item with last
+    minHeap[0]= minHeap[currLast];
+    minHeap[currLast] = 0;
+    currLast --;
+    siftDown(0);
+    // use siftDown
 }
 
 
@@ -59,20 +93,32 @@ int main()
     for(int i = 0; i < ARR_SIZE; i++)
     {
         ifs >> temp;
-        insert(temp);
+        insertItem(temp);
         temp = 0;
         // cout << minHeap[i] << '\n';
     }
+    cout << '\n';
 
     for(int i = 0; i < ARR_SIZE; i ++)
     {
         cout << minHeap[i] << '\n';
     }
-    cout << "parent 1: " << minHeap[0] << '\n';
-    cout << "parent 1 left: " << minHeap[2*0+1] << '\n';
-    cout << "parent 1 right: " << minHeap[2*0+2] << '\n';
-    cout << "parent 2: " << minHeap[1] << '\n';
-    cout << "parent 2 left: " << minHeap[2*1+1] << '\n';
-    cout << "parent 2 right: " << minHeap[2*1+2] << '\n';
+    cout << '\n';
+    // cout << "parent 1: " << minHeap[0] << '\n';
+    // cout << "parent 1 left: " << minHeap[2*0+1] << '\n';
+    // cout << "parent 1 right: " << minHeap[2*0+2] << '\n';
+    // cout << "parent 2: " << minHeap[1] << '\n';
+    // cout << "parent 2 left: " << minHeap[2*1+1] << '\n';
+    // cout << "parent 2 right: " << minHeap[2*1+2] << '\n';
     // cout << minHeap[7] << currLast;
+    deleteItem();
+    for(int i = 0; i < currLast; i ++)
+    {
+        cout << minHeap[i] << '\n';
+    }
+    // deleteItem();
+    // deleteItem();
+    // deleteItem();
+    // deleteItem();
+    
 }
