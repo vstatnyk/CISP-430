@@ -8,3 +8,4 @@ main.dSYM/Contents/Resources/DWARF/main
 output.txt
 avl
 .vscode/settings.json
+.vscode/c_cpp_properties.json
