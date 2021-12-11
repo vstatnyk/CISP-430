@@ -80,10 +80,33 @@ void deleteItem()
     minHeap[0]= minHeap[currLast];
     minHeap[currLast] = 0;
     currLast --;
-    siftDown(0);
+
     // use siftDown
+    siftDown(0);
 }
 
+void printHeap()
+{
+    int itemsOnLevel = 1;
+    int numbersPrinted = 0;
+    while(numbersPrinted <= currLast)
+    {
+        // cout << "started while loop:\n";
+        // cout << "numbersPrinted: " << numbersPrinted;
+        // cout << "currLast" << currLast << '\n';
+        for(int i = 0; i != itemsOnLevel; i ++)
+        {
+            if (numbersPrinted > currLast)
+            {
+                return;
+            }
+            cout << minHeap[numbersPrinted] << ' ';
+            numbersPrinted ++;
+        }
+        itemsOnLevel *= 2;
+        cout <<'\n';
+    }
+}
 
 int main()
 {
@@ -94,31 +117,27 @@ int main()
     {
         ifs >> temp;
         insertItem(temp);
+        
         temp = 0;
-        // cout << minHeap[i] << '\n';
     }
-    cout << '\n';
-
-    for(int i = 0; i < ARR_SIZE; i ++)
-    {
-        cout << minHeap[i] << '\n';
-    }
-    cout << '\n';
-    // cout << "parent 1: " << minHeap[0] << '\n';
-    // cout << "parent 1 left: " << minHeap[2*0+1] << '\n';
-    // cout << "parent 1 right: " << minHeap[2*0+2] << '\n';
-    // cout << "parent 2: " << minHeap[1] << '\n';
-    // cout << "parent 2 left: " << minHeap[2*1+1] << '\n';
-    // cout << "parent 2 right: " << minHeap[2*1+2] << '\n';
-    // cout << minHeap[7] << currLast;
+    currLast --;
+    
+    printHeap();
     deleteItem();
-    for(int i = 0; i < currLast; i ++)
-    {
-        cout << minHeap[i] << '\n';
-    }
-    // deleteItem();
-    // deleteItem();
-    // deleteItem();
-    // deleteItem();
+    cout << "\n\n";
+    printHeap();
+    cout << "\n\n";
+    deleteItem();
+    printHeap();
+    cout << "\n\n";
+    deleteItem();
+    printHeap();
+    cout << "\n\n";
+    deleteItem();
+    printHeap();
+    cout << "\n\n";
+    deleteItem();
+    printHeap();
+    cout << "\n\n";
     
 }
